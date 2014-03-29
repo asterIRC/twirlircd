@@ -31,7 +31,7 @@
 class SSLMode : public ModeHandler
 {
  public:
-	SSLMode(Module* Creator) : ModeHandler(Creator, "sslonly", 'z', PARAM_NONE, MODETYPE_CHANNEL) { }
+	SSLMode(Module* Creator) : ModeHandler(Creator, "sslonly", 'S', PARAM_NONE, MODETYPE_CHANNEL) { }
 
 	ModeAction OnModeChange(User* source, User* dest, Channel* channel, std::string &parameter, bool adding)
 	{
@@ -53,7 +53,7 @@ class SSLMode : public ModeHandler
 						}
 					}
 				}
-				channel->SetMode('z',true);
+				channel->SetMode('S',true);
 				return MODEACTION_ALLOW;
 			}
 			else
@@ -63,9 +63,9 @@ class SSLMode : public ModeHandler
 		}
 		else
 		{
-			if (channel->IsModeSet('z'))
+			if (channel->IsModeSet('S'))
 			{
-				channel->SetMode('z',false);
+				channel->SetMode('S',false);
 				return MODEACTION_ALLOW;
 			}
 
@@ -94,7 +94,7 @@ class ModuleSSLModes : public Module
 
 	ModResult OnUserPreJoin(User* user, Channel* chan, const char* cname, std::string &privs, const std::string &keygiven)
 	{
-		if(chan && chan->IsModeSet('z'))
+		if(chan && chan->IsModeSet('S'))
 		{
 			UserCertificateRequest req(user, this);
 			req.Send();
@@ -106,7 +106,7 @@ class ModuleSSLModes : public Module
 			else
 			{
 				// Deny
-				user->WriteServ( "489 %s %s :Cannot join channel; SSL users only (+z)", user->nick.c_str(), cname);
+				user->WriteServ("489 %s %s :This channel is only accessible to SSL users. Cannot join.", user->nick.c_str(), cname);
 				return MOD_RES_DENY;
 			}
 		}
@@ -137,7 +137,7 @@ class ModuleSSLModes : public Module
 
 	Version GetVersion()
 	{
-		return Version("Provides channel mode +z to allow for Secure/SSL only channels", VF_VENDOR);
+		return Version("Provides channel mode +S and extban z: to allow for Secure/SSL only channels", VF_VENDOR);
 	}
 };
 

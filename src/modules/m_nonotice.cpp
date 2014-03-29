@@ -26,7 +26,7 @@
 class NoNotice : public SimpleChannelModeHandler
 {
  public:
-	NoNotice(Module* Creator) : SimpleChannelModeHandler(Creator, "nonotice", 'T') { }
+	NoNotice(Module* Creator) : SimpleChannelModeHandler(Creator, "nonotice", 'N') { }
 };
 
 class ModuleNoNotice : public Module
@@ -57,14 +57,14 @@ class ModuleNoNotice : public Module
 		if ((target_type == TYPE_CHANNEL) && (IS_LOCAL(user)))
 		{
 			Channel* c = (Channel*)dest;
-			if (!c->GetExtBanStatus(user, 'T').check(!c->IsModeSet('T')))
+			if (!c->GetExtBanStatus(user, 'T').check(!c->IsModeSet('N')))
 			{
 				res = ServerInstance->OnCheckExemption(user,c,"nonotice");
 				if (res == MOD_RES_ALLOW)
 					return MOD_RES_PASSTHRU;
 				else
 				{
-					user->WriteNumeric(ERR_CANNOTSENDTOCHAN, "%s %s :Can't send NOTICE to channel (+T set)",user->nick.c_str(), c->name.c_str());
+					user->WriteNumeric(ERR_CANNOTSENDTOCHAN, "%s %s :Can't send NOTICE to channel (+N set)",user->nick.c_str(), c->name.c_str());
 					return MOD_RES_DENY;
 				}
 			}

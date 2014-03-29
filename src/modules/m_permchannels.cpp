@@ -61,7 +61,7 @@ static bool WriteDatabase(Module* mod, bool save_listmodes)
 	for (chan_hash::const_iterator i = ServerInstance->chanlist->begin(); i != ServerInstance->chanlist->end(); i++)
 	{
 		Channel* chan = i->second;
-		if (!chan->IsModeSet('P'))
+		if (!chan->IsModeSet('z'))
 			continue;
 
 		std::string chanmodes = chan->ChanModes(true);
@@ -181,21 +181,21 @@ static bool WriteDatabase(Module* mod, bool save_listmodes)
 class PermChannel : public ModeHandler
 {
  public:
-	PermChannel(Module* Creator) : ModeHandler(Creator, "permanent", 'P', PARAM_NONE, MODETYPE_CHANNEL) { oper = true; }
+	PermChannel(Module* Creator) : ModeHandler(Creator, "permanent", 'z', PARAM_NONE, MODETYPE_CHANNEL) { oper = true; }
 
 	ModeAction OnModeChange(User* source, User* dest, Channel* channel, std::string &parameter, bool adding)
 	{
 		if (adding)
 		{
-			if (!channel->IsModeSet('P'))
+			if (!channel->IsModeSet('z'))
 			{
-				channel->SetMode('P',true);
+				channel->SetMode('z',true);
 				return MODEACTION_ALLOW;
 			}
 		}
 		else
 		{
-			if (channel->IsModeSet('P'))
+			if (channel->IsModeSet('z'))
 			{
 				channel->SetMode(this,false);
 				if (channel->GetUserCounter() == 0)
@@ -332,7 +332,7 @@ public:
 
 	virtual ModResult OnRawMode(User* user, Channel* chan, const char mode, const std::string &param, bool adding, int pcnt)
 	{
-		if (chan && (chan->IsModeSet('P') || mode == 'P'))
+		if (chan && (chan->IsModeSet('z') || mode == 'z'))
 			dirty = true;
 
 		return MOD_RES_PASSTHRU;
@@ -340,7 +340,7 @@ public:
 
 	virtual void OnPostTopicChange(User*, Channel *c, const std::string&)
 	{
-		if (c->IsModeSet('P'))
+		if (c->IsModeSet('z'))
 			dirty = true;
 	}
 
@@ -407,7 +407,7 @@ public:
 
 	virtual ModResult OnChannelPreDelete(Channel *c)
 	{
-		if (c->IsModeSet('P'))
+		if (c->IsModeSet('z'))
 			return MOD_RES_DENY;
 
 		return MOD_RES_PASSTHRU;

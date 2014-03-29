@@ -21,14 +21,14 @@
 
 #include "inspircd.h"
 
-/* $ModDesc: Provides channel +S mode (strip ansi color) */
+/* $ModDesc: Provides channel +c mode (strip ansi color) */
 
-/** Handles channel mode +S
+/** Handles channel mode +c
  */
 class ChannelStripColor : public SimpleChannelModeHandler
 {
  public:
-	ChannelStripColor(Module* Creator) : SimpleChannelModeHandler(Creator, "stripcolor", 'S') { }
+	ChannelStripColor(Module* Creator) : SimpleChannelModeHandler(Creator, "stripcolor", 'c') { }
 };
 
 /** Handles user mode +S
@@ -86,7 +86,7 @@ class ModuleStripColor : public Module
 			if (res == MOD_RES_ALLOW)
 				return MOD_RES_PASSTHRU;
 
-			active = !t->GetExtBanStatus(user, 'S').check(!t->IsModeSet('S'));
+			active = !t->GetExtBanStatus(user, 'c').check(!t->IsModeSet('c'));
 		}
 
 		if (active)
@@ -104,7 +104,7 @@ class ModuleStripColor : public Module
 
 	virtual Version GetVersion()
 	{
-		return Version("Provides channel +S mode (strip ansi color)", VF_VENDOR);
+		return Version("Provides channel +c mode (strip ansi color)", VF_VENDOR);
 	}
 
 };

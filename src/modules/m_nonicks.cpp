@@ -26,7 +26,7 @@
 class NoNicks : public SimpleChannelModeHandler
 {
  public:
-	NoNicks(Module* Creator) : SimpleChannelModeHandler(Creator, "nonick", 'N') { }
+	NoNicks(Module* Creator) : SimpleChannelModeHandler(Creator, "nonick", 'E') { }
 };
 
 class ModuleNoNickChange : public Module
@@ -52,7 +52,7 @@ class ModuleNoNickChange : public Module
 
 	virtual Version GetVersion()
 	{
-		return Version("Provides support for channel mode +N & extban +b N: which prevents nick changes on channel", VF_VENDOR);
+		return Version("Provides support for channel mode +E & extban +b N: which prevents nick changes on channel", VF_VENDOR);
 	}
 
 
@@ -82,9 +82,9 @@ class ModuleNoNickChange : public Module
 			if (override && IS_OPER(user))
 				continue;
 
-			if (!curr->GetExtBanStatus(user, 'N').check(!curr->IsModeSet('N')))
+			if (!curr->GetExtBanStatus(user, 'N').check(!curr->IsModeSet('E')))
 			{
-				user->WriteNumeric(ERR_CANTCHANGENICK, "%s :Can't change nickname while on %s (+N is set)",
+				user->WriteNumeric(ERR_CANTCHANGENICK, "%s :Can't change nickname while on %s (+E is set)",
 					user->nick.c_str(), curr->name.c_str());
 				return MOD_RES_DENY;
 			}

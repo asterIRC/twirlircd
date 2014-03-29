@@ -86,7 +86,7 @@ class ModuleChanLog : public Module
 			Channel *c = ServerInstance->FindChan(it->second);
 			if (c)
 			{
-				c->WriteChannelWithServ(ServerInstance->Config->ServerName, "PRIVMSG %s :%s", c->name.c_str(), buf);
+				c->WriteChannelWithServ(ServerInstance->Config->ServerName, "NOTICE %s :%s", c->name.c_str(), buf);
 				ServerInstance->PI->SendChannelPrivmsg(c, 0, buf);
 			}
 		}

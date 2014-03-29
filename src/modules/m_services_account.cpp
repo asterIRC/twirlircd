@@ -167,7 +167,7 @@ class ModuleServicesAccount : public Module
 		if (dest->IsModeSet('r'))
 		{
 			/* user is registered */
-			ServerInstance->SendWhoisLine(source, dest, 307, "%s %s :is a registered nick", source->nick.c_str(), dest->nick.c_str());
+			ServerInstance->SendWhoisLine(source, dest, 307, "%s %s :is logged into an account to which this nickname is grouped", source->nick.c_str(), dest->nick.c_str());
 		}
 	}
 
