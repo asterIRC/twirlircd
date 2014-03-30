@@ -334,14 +334,15 @@ class ModuleCloaking : public Module
 			char buf[50];
 			if (ip.sa.sa_family == AF_INET6)
 			{
-				char ip6seg1[13];
-				char ip6seg2[13];
-				char ip6seg3[13];
-				char ip6seg4[12];
-				snprintf(ip6seg1, 13, "%x%x", ip.in6.sin6_addr.s6_addr[0], ip.in6.sin6_addr.s6_addr[1]);
-				snprintf(ip6seg2, 13, "%x%x", ip.in6.sin6_addr.s6_addr[2], ip.in6.sin6_addr.s6_addr[3]);
-				snprintf(buf, 50, "%s%s:",
-					SegmentCloak(ip6seg1,14,8), SegmentCloak(ip6seg2,16,8));
+                                char ip6useg1[13];
+                                char ip6useg2[13];
+                                char ip6useg3[26];
+                                char ip6seg1[13];
+                                snprintf(ip6useg1, 13, "%x%x", ip.in6.sin6_addr.s6_addr[0], ip.in6.sin6_addr.s6_addr[1]);
+                                snprintf(ip6useg2, 13, "%x%x", ip.in6.sin6_addr.s6_addr[2], ip.in6.sin6_addr.s6_addr[3]);
+                                snprintf(ip6useg3, 26, "%s%s", ip6useg1, ip6useg2);
+                                snprintf(buf, 50, "%s:%s:",
+                                        ip6useg1, ip6useg2);
 			}
 			else
 			{
@@ -350,7 +351,7 @@ class ModuleCloaking : public Module
 				char ip4seg2[3];
 				snprintf(ip4seg1, 3, "%d", ip4[0]);
 				snprintf(ip4seg2, 3, "%d", ip4[1]);
-				snprintf(buf, 50, "%s.%s", SegmentCloak(ip4seg1,18,8), SegmentCloak(ip4seg2,19,8));
+				snprintf(buf, 50, "%s.%s.", ip4seg1, ip4seg2);
 			}
 			std::string buffer;
 			buffer.append(prefix);
