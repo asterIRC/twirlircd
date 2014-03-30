@@ -41,7 +41,7 @@ enum CloakMode
 };
 
 // lowercase-only encoding similar to base64, used for hash output
-static const char base32[] = "0123456789ABCDEF";
+static const char base32[] = "0123456789ABCDEF0123456789ABCDEF";
 
 /** Handles user mode +x
  */
