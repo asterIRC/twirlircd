@@ -41,7 +41,7 @@ enum CloakMode
 };
 
 // lowercase-only encoding similar to base64, used for hash output
-static const char base32[] = "0123456789abcdefghijklmnopqrstuv";
+static const char base32[] = "0123456789ABCDEF";
 
 /** Handles user mode +x
  */
@@ -214,7 +214,7 @@ class ModuleCloaking : public Module
 		input.append(item);
 
 		std::string rv = Hash->sum(input).substr(0,len);
-		for(int i=0; i < len; i++)
+		for(int i=0; i < 8; i++)
 		{
 			// this discards 3 bits per byte. We have an
 			// overabundance of bits in the hash output, doesn't
@@ -303,28 +303,28 @@ class ModuleCloaking : public Module
 		{
 			bindata = std::string((const char*)&ip.in4.sin_addr, 4);
 			hop1 = 3;
-			hop2 = 0;
+			hop2 = 3;
 			hop3 = 2;
-			len1 = len2 = 3;
+			len1 = len2 = 6;
 			// pfx s1.s2. (xxx.xxx or s3) sfx
 			rv.reserve(prefix.length() + 15 + suffix.length());
 		}
 
 		rv.append(prefix);
 		rv.append(SegmentCloak(bindata, 10, len1));
-		rv.append(1, '.');
+		rv.append(1, (ip.sa.sa_family == AF_INET6)?':':'.');
 		bindata.erase(hop1);
 		rv.append(SegmentCloak(bindata, 11, len2));
 		if (hop2)
 		{
-			rv.append(1, '.');
+			rv.append(1, (ip.sa.sa_family == AF_INET6)?':':'.');
 			bindata.erase(hop2);
 			rv.append(SegmentCloak(bindata, 12, len2));
 		}
 
 		if (full)
 		{
-			rv.append(1, '.');
+			rv.append(1, (ip.sa.sa_family == AF_INET6)?':':'.');
 			bindata.erase(hop3);
 			rv.append(SegmentCloak(bindata, 13, 6));
 			rv.append(suffix);
@@ -334,16 +334,17 @@ class ModuleCloaking : public Module
 			char buf[50];
 			if (ip.sa.sa_family == AF_INET6)
 			{
-				snprintf(buf, 50, ".%02x%02x.%02x%02x%s",
-					ip.in6.sin6_addr.s6_addr[2], ip.in6.sin6_addr.s6_addr[3],
-					ip.in6.sin6_addr.s6_addr[0], ip.in6.sin6_addr.s6_addr[1], suffix.c_str());
+				snprintf(buf, 50, "%02x%02x%02x%02x:",
+					SegmentCloak(ip.in6.sin6_addr.s6_addr[0]), SegmentCloak(ip.in6.sin6_addr.s6_addr[1]),
+					SegmentCloak(ip.in6.sin6_addr.s6_addr[2]), SegmentCloak(ip.in6.sin6_addr.s6_addr[3]));
 			}
 			else
 			{
 				const unsigned char* ip4 = (const unsigned char*)&ip.in4.sin_addr;
-				snprintf(buf, 50, ".%d.%d%s", ip4[1], ip4[0], suffix.c_str());
+				snprintf(buf, 50, "%d.%d", SegmentCloak(ip4[0]), SegmentCloak(ip4[1]));
 			}
-			rv.append(buf);
+			buf.append(rv);
+			rv = buf;
 		}
 		return rv;
 	}
