@@ -310,7 +310,7 @@ class ModuleCloaking : public Module
 			rv.reserve(prefix.length() + 15 + suffix.length());
 		}
 
-		rv.append(prefix);
+		//rv.append(prefix);
 		rv.append(SegmentCloak(bindata, 10, len1));
 		rv.append(1, (ip.sa.sa_family == AF_INET6)?':':'.');
 		bindata.erase(hop1);
@@ -334,17 +334,29 @@ class ModuleCloaking : public Module
 			char buf[50];
 			if (ip.sa.sa_family == AF_INET6)
 			{
-				snprintf(buf, 50, "%02x%02x%02x%02x:",
-					SegmentCloak(ip.in6.sin6_addr.s6_addr[0]), SegmentCloak(ip.in6.sin6_addr.s6_addr[1]),
-					SegmentCloak(ip.in6.sin6_addr.s6_addr[2]), SegmentCloak(ip.in6.sin6_addr.s6_addr[3]));
+				char ip6seg1[13];
+				char ip6seg2[13];
+				char ip6seg3[13];
+				char ip6seg4[12];
+				snprintf(ip6seg1, 13, "%x%x", ip.in6.sin6_addr.s6_addr[0], ip.in6.sin6_addr.s6_addr[1]);
+				snprintf(ip6seg2, 13, "%x%x", ip.in6.sin6_addr.s6_addr[2], ip.in6.sin6_addr.s6_addr[3]);
+				snprintf(buf, 50, "%s%s:",
+					SegmentCloak(ip6seg1,14,8), SegmentCloak(ip6seg2,16,8));
 			}
 			else
 			{
 				const unsigned char* ip4 = (const unsigned char*)&ip.in4.sin_addr;
-				snprintf(buf, 50, "%d.%d", SegmentCloak(ip4[0]), SegmentCloak(ip4[1]));
+				char ip4seg1[3];
+				char ip4seg2[3];
+				snprintf(ip4seg1, 3, "%d", ip4[0]);
+				snprintf(ip4seg2, 3, "%d", ip4[1]);
+				snprintf(buf, 50, "%s.%s", SegmentCloak(ip4seg1,18,8), SegmentCloak(ip4seg2,19,8));
 			}
-			buf.append(rv);
-			rv = buf;
+			std::string buffer;
+			buffer.append(prefix);
+			buffer.append(buf);
+			buffer.append(rv);
+			rv = buffer;
 		}
 		return rv;
 	}
