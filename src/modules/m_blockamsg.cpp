@@ -147,7 +147,7 @@ class ModuleBlockAmsg : public Module
 				if(action == IBLOCK_KILL || action == IBLOCK_KILLOPERS)
 					ServerInstance->Users->QuitUser(user, "You have been killed for use of /amsg or /ame");
 				else if(action == IBLOCK_NOTICE || action == IBLOCK_NOTICEOPERS)
-					user->WriteServ(":0ServerNotice@amsg-blocked. NOTICE %s :Global message (/amsg or /ame) denied", user->nick.c_str());
+					user->Write(":0ServerNotice@amsg-blocked. NOTICE %s :Global message (/amsg or /ame) denied", user->nick.c_str());
 
 				return MOD_RES_DENY;
 			}
