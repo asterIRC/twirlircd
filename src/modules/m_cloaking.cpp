@@ -311,9 +311,9 @@ class ModuleCloaking : public Module
 		}
 
 		//rv.append(prefix);
-		rv.append(SegmentCloak(bindata, 10, len1));
-		rv.append(1, (ip.sa.sa_family == AF_INET6)?':':'.');
-		bindata.erase(hop1);
+		//rv.append(SegmentCloak(bindata, 10, len1));
+		//rv.append(1, (ip.sa.sa_family == AF_INET6)?':':'.');
+		//bindata.erase(hop1);
 		rv.append(SegmentCloak(bindata, 11, len2));
 		if (hop2)
 		{
