@@ -351,9 +351,9 @@ class ModuleCloaking : public Module
 			std::string buffer;
 			buffer.append(prefix);
 			buffer.append(SegmentCloak(ipseg1,8,8));
-			rv.append((ip.sa.sa_family == AF_INET6)?":":".");
+			buffer.append((ip.sa.sa_family == AF_INET6)?":":".");
 			buffer.append(SegmentCloak(ipseg2,8,9));
-			rv.append((ip.sa.sa_family == AF_INET6)?":":".");
+			buffer.append((ip.sa.sa_family == AF_INET6)?":":".");
 			buffer.append(rv);
 			rv = buffer;
 		}
