@@ -41,7 +41,7 @@ enum CloakMode
 };
 
 // lowercase-only encoding similar to base64, used for hash output
-static const char base32[] = "0123456789ABCDEF0123456789ABCDEF";
+static const char base32[] = "0123456789ABCDEFGHIJKLMNOPQRSTUV";
 
 /** Handles user mode +x
  */
@@ -214,9 +214,9 @@ class ModuleCloaking : public Module
 		input.append(item);
 
 		std::string rv = Hash->sum(input).substr(0,len);
-		for(int i=0; i < 8; i++)
+		for(int i=0; i < 13; i++)
 		{
-			// this discards 3 bits per byte. We have an
+			// this discards a lot of detail, and adds hash collisions. We have an
 			// overabundance of bits in the hash output, doesn't
 			// matter which ones we are discarding.
 			rv[i] = base32[rv[i] & 0x1F];
@@ -332,30 +332,28 @@ class ModuleCloaking : public Module
 		else
 		{
 			char buf[50];
+                        char ipseg1[13];
+                        char ipseg2[13];
 			if (ip.sa.sa_family == AF_INET6)
 			{
-                                char ip6useg1[13];
-                                char ip6useg2[13];
-                                char ip6useg3[26];
-                                char ip6seg1[13];
-                                snprintf(ip6useg1, 13, "%x%x", ip.in6.sin6_addr.s6_addr[0], ip.in6.sin6_addr.s6_addr[1]);
-                                snprintf(ip6useg2, 13, "%x%x", ip.in6.sin6_addr.s6_addr[2], ip.in6.sin6_addr.s6_addr[3]);
-                                snprintf(ip6useg3, 26, "%s%s", ip6useg1, ip6useg2);
+                                snprintf(ipseg1, 13, "%x%x", ip.in6.sin6_addr.s6_addr[0], ip.in6.sin6_addr.s6_addr[1]);
+                                snprintf(ipseg2, 13, "%x%x", ip.in6.sin6_addr.s6_addr[2], ip.in6.sin6_addr.s6_addr[3]);
                                 snprintf(buf, 50, "%s:%s:",
-                                        ip6useg1, ip6useg2);
+                                        ipseg1, ipseg2);
 			}
 			else
 			{
 				const unsigned char* ip4 = (const unsigned char*)&ip.in4.sin_addr;
-				char ip4seg1[3];
-				char ip4seg2[3];
-				snprintf(ip4seg1, 3, "%d", ip4[0]);
-				snprintf(ip4seg2, 3, "%d", ip4[1]);
-				snprintf(buf, 50, "%s.%s.", ip4seg1, ip4seg2);
+				snprintf(ipseg1, 4, "%d", ip4[0]);
+				snprintf(ipseg2, 4, "%d", ip4[1]);
+				snprintf(buf, 50, "%s.%s.", ipseg1, ipseg2);
 			}
 			std::string buffer;
 			buffer.append(prefix);
-			buffer.append(buf);
+			buffer.append(SegmentCloak(ipseg1,14,8));
+			rv.append(1, (ip.sa.sa_family == AF_INET6)?':':'.');
+			buffer.append(SegmentCloak(ipseg1,14,8));
+			rv.append(1, (ip.sa.sa_family == AF_INET6)?':':'.');
 			buffer.append(rv);
 			rv = buffer;
 		}
