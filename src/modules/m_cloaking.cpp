@@ -214,7 +214,7 @@ class ModuleCloaking : public Module
 		input.append(item);
 
 		std::string rv = Hash->sum(input).substr(0,len);
-		for(int i=0; i < 13; i++)
+		for(int i=0; i < len; i++)
 		{
 			// this discards a lot of detail, and adds hash collisions. We have an
 			// overabundance of bits in the hash output, doesn't
@@ -319,14 +319,14 @@ class ModuleCloaking : public Module
 		{
 			rv.append(1, (ip.sa.sa_family == AF_INET6)?':':'.');
 			bindata.erase(hop2);
-			rv.append(SegmentCloak(bindata, 12, len2));
+			rv.append(SegmentCloak(bindata, 12, 4));
 		}
 
 		if (full)
 		{
 			rv.append(1, (ip.sa.sa_family == AF_INET6)?':':'.');
 			bindata.erase(hop3);
-			rv.append(SegmentCloak(bindata, 13, 6));
+			rv.append(SegmentCloak(bindata, 13, 9));
 			rv.append(suffix);
 		}
 		else
@@ -352,7 +352,7 @@ class ModuleCloaking : public Module
 			buffer.append(prefix);
 			buffer.append(SegmentCloak(ipseg1,14,8));
 			rv.append(1, (ip.sa.sa_family == AF_INET6)?':':'.');
-			buffer.append(SegmentCloak(ipseg1,14,8));
+			buffer.append(SegmentCloak(ipseg2,15,9));
 			rv.append(1, (ip.sa.sa_family == AF_INET6)?':':'.');
 			buffer.append(rv);
 			rv = buffer;
