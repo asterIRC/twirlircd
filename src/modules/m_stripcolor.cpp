@@ -91,7 +91,29 @@ class ModuleStripColor : public Module
 
 		if (active)
 		{
-			InspIRCd::StripColor(text);
+			for (std::string::iterator i = text.begin(); i != text.end(); i++)
+			{
+				switch (*i)
+				{
+					case 2:
+					case 3:
+					case 15:
+					case 21:
+					case 22:
+					case 31:
+					if (target_type == TYPE_CHANNEL) {
+						Channel* t = (Channel*)dest;
+						user->WriteNumeric(404, "%s %s :Message not delivered as sent (colours were stripped because +c is set)",user->nick.c_str(), t->name.c_str());
+						InspIRCd::StripColor(text);
+						user->Write(":%s!%s@%s PRIVMSG %s :[stripcolor] %s",user->nick.c_str(),user->ident.c_str(),user->dhost.c_str(),t->name.c_str(),text);
+					} else if (target_type == TYPE_USER) {
+						User* t = (User*)dest;
+						user->WriteNumeric(404, "%s %s :Message not delivered as sent (colours were stripped because +S is set)",user->nick.c_str(), t->nick.c_str());
+						InspIRCd::StripColor(text);
+					}
+					break;
+				}
+			}
 		}
 
 		return MOD_RES_PASSTHRU;

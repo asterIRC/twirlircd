@@ -518,7 +518,7 @@ void Channel::KickUser(User *src, User *user, const char* reason)
 		}
 		if ((ServerInstance->ULine(user->server)) && (!ServerInstance->ULine(src->server)))
 		{
-			src->WriteNumeric(ERR_CHANOPRIVSNEEDED, "%s %s :Only a u-line may kick a u-line from a channel.",src->nick.c_str(), this->name.c_str());
+			src->WriteNumeric(ERR_CHANOPRIVSNEEDED, "%s %s :Cannot kick, kill or deop a network service.",src->nick.c_str(), this->name.c_str());
 			return;
 		}
 

@@ -74,7 +74,15 @@ class ModuleServProtectMode : public Module
 	{
 		if (dst->IsModeSet('k'))
 		{
-			ServerInstance->SendWhoisLine(src, dst, 310, src->nick+" "+dst->nick+" :is an "+ServerInstance->Config->Network+" Service");
+			if ( (ServerInstance->Config->Network.substr(0,1)) == "a" || (ServerInstance->Config->Network.substr(0,1)) == "A" || 
+			(ServerInstance->Config->Network.substr(0,1)) == "e" || (ServerInstance->Config->Network.substr(0,1)) == "E" || 
+			(ServerInstance->Config->Network.substr(0,1)) == "i" || (ServerInstance->Config->Network.substr(0,1)) == "I" || 
+			(ServerInstance->Config->Network.substr(0,1)) == "o" || (ServerInstance->Config->Network.substr(0,1)) == "O" || 
+			(ServerInstance->Config->Network.substr(0,1)) == "u" || (ServerInstance->Config->Network.substr(0,1)) == "U") {
+				ServerInstance->SendWhoisLine(src, dst, 310, src->nick+" "+dst->nick+" :is an "+ServerInstance->Config->Network+" service");
+			} else {
+				ServerInstance->SendWhoisLine(src, dst, 310, src->nick+" "+dst->nick+" :is a "+ServerInstance->Config->Network+" service");
+			}
 		}
 	}
 
@@ -98,7 +106,7 @@ class ModuleServProtectMode : public Module
 				if (u->IsModeSet('k') && memb && memb->modes.find(mode) != std::string::npos)
 				{
 					/* BZZZT, Denied! */
-					user->WriteNumeric(482, "%s %s :You are not permitted to remove privileges from %s services", user->nick.c_str(), chan->name.c_str(), ServerInstance->Config->Network.c_str());
+					user->WriteNumeric(482, "%s %s :Cannot kick, kill or deop a network service", user->nick.c_str(), chan->name.c_str()/*, ServerInstance->Config->Network.c_str()*/);
 					return MOD_RES_DENY;
 				}
 			}
@@ -114,7 +122,7 @@ class ModuleServProtectMode : public Module
 
 		if (dst->IsModeSet('k'))
 		{
-			src->WriteNumeric(485, "%s :You are not permitted to kill %s services!", src->nick.c_str(), ServerInstance->Config->Network.c_str());
+			src->WriteNumeric(485, "%s :Cannot kick, kill or deop a network service", src->nick.c_str()/*, ServerInstance->Config->Network.c_str()*/);
 			ServerInstance->SNO->WriteGlobalSno('a', src->nick+" tried to kill service "+dst->nick+" ("+reason+")");
 			return MOD_RES_DENY;
 		}
@@ -125,7 +133,7 @@ class ModuleServProtectMode : public Module
 	{
 		if (memb->user->IsModeSet('k'))
 		{
-			src->WriteNumeric(484, "%s %s :You are not permitted to kick services",
+			src->WriteNumeric(484, "%s %s :Cannot kick, kill or deop a network service.",
 				src->nick.c_str(), memb->chan->name.c_str());
 			return MOD_RES_DENY;
 		}
