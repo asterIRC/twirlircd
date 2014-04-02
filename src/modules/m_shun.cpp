@@ -21,6 +21,7 @@
 
 
 #include "inspircd.h"
+#include "account.h"
 #include "xline.h"
 
 /* $ModDesc: Provides the /SHUN command, which stops a user from executing all except configured commands. */
@@ -180,6 +181,7 @@ class ModuleShun : public Module
 	CommandShun cmd;
 	ShunFactory f;
 	std::set<std::string> ShunEnabledCommands;
+	bool ulinepm;
 	bool NotifyOfShun;
 	bool affectopers;
 
@@ -240,6 +242,7 @@ class ModuleShun : public Module
 
 		NotifyOfShun = tag->getBool("notifyuser", true);
 		affectopers = tag->getBool("affectopers", false);
+		ulinepm = tag->getBool("ulinepm", true);
 	}
 
 	virtual ModResult OnPreCommand(std::string &command, std::vector<std::string>& parameters, LocalUser* user, bool validated, const std::string &original_line)
@@ -260,6 +263,14 @@ class ModuleShun : public Module
 		}
 
 		std::set<std::string>::iterator i = ShunEnabledCommands.find(command);
+
+		if (command == "PRIVMSG")
+		{
+			User* u = ServerInstance->FindNick(parameters[0]);
+			if (ServerInstance->ULine(u->server) && ulinepm) return MOD_RES_PASSTHRU;
+			user->WriteServ("NOTICE %s :*** Message not sent because you are shunned and the target is not a U:line", user->nick.c_str());
+			return MOD_RES_DENY;
+		}
 
 		if (i == ShunEnabledCommands.end())
 		{
