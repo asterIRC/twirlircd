@@ -72,7 +72,6 @@ class CommandOjoin : public Command
 		if (channel)
 		{
 			ServerInstance->SNO->WriteGlobalSno('a', user->nick+" used OJOIN to join "+channel->name);
-
 			if (notice)
 			{
 				channel = ServerInstance->FindChan(parameters[0]);
@@ -89,6 +88,13 @@ class CommandOjoin : public Command
 			modes.push_back(parameters[0]);
 			modes.push_back(op ? "+Yo" : "+Y");
 			modes.push_back(user->nick);
+			if (notice)
+			{
+				channel = ServerInstance->FindChan(parameters[0]);
+				channel->WriteChannelWithServ(ServerInstance->Config->ServerName, "NOTICE %s :%s joined on official network business.",
+					parameters[0].c_str(), user->nick.c_str());
+				ServerInstance->PI->SendChannelNotice(channel, 0, user->nick + " joined on official network business.");
+			}
 			if (op)
 				modes.push_back(user->nick);
 			ServerInstance->SendGlobalMode(modes, ServerInstance->FakeClient);
