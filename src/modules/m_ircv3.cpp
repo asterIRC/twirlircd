@@ -27,9 +27,11 @@ class ModuleIRCv3 : public Module
 	GenericCap cap_accountnotify;
 	GenericCap cap_awaynotify;
 	GenericCap cap_extendedjoin;
+	GenericCap cap_chghost;
 	bool accountnotify;
 	bool awaynotify;
 	bool extendedjoin;
+	bool chghost;
 
 	CUList last_excepts;
 
@@ -74,14 +76,15 @@ class ModuleIRCv3 : public Module
  public:
 	ModuleIRCv3() : cap_accountnotify(this, "account-notify"),
 					cap_awaynotify(this, "away-notify"),
-					cap_extendedjoin(this, "extended-join")
+					cap_extendedjoin(this, "extended-join"),
+					cap_chghost(this, "chghost")
 	{
 	}
 
 	void init()
 	{
 		OnRehash(NULL);
-		Implementation eventlist[] = { I_OnUserJoin, I_OnPostJoin, I_OnSetAway, I_OnEvent, I_OnRehash };
+		Implementation eventlist[] = { I_OnChangeHost, I_OnUserJoin, I_OnPostJoin, I_OnSetAway, I_OnEvent, I_OnRehash };
 		ServerInstance->Modules->Attach(eventlist, this, sizeof(eventlist)/sizeof(Implementation));
 	}
 
@@ -91,6 +94,7 @@ class ModuleIRCv3 : public Module
 		accountnotify = conf->getBool("accountnotify", conf->getBool("accoutnotify", true));
 		awaynotify = conf->getBool("awaynotify", true);
 		extendedjoin = conf->getBool("extendedjoin", true);
+		chghost = conf->getBool("chghost", true);
 	}
 
 	void OnEvent(Event& ev)
@@ -120,6 +124,14 @@ class ModuleIRCv3 : public Module
 				WriteNeighboursWithExt(ae->user, line, cap_accountnotify.ext);
 			}
 		}
+	}
+
+	void OnChangeHost(User* u, const std::string& host)
+	{
+		std::string line =  ":" + u->GetFullHost() + " CHGHOST ";
+		line += std::string(host);
+
+		WriteNeighboursWithExt(u, line, cap_chghost.ext);
 	}
 
 	void OnUserJoin(Membership* memb, bool sync, bool created, CUList& excepts)
