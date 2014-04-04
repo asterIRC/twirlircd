@@ -73,6 +73,44 @@ class ModuleIRCv3 : public Module
 		}
 	}
 
+	void WriteNeighboursWithoutExt(User* user, const std::string& line, const LocalIntExt& ext)
+	{
+		UserChanList chans(user->chans);
+
+		std::map<User*, bool> exceptions;
+		FOREACH_MOD(I_OnBuildNeighborList, OnBuildNeighborList(user, chans, exceptions));
+
+		// Send it to all local users who were explicitly marked as neighbours by modules and haven't the required ext
+		for (std::map<User*, bool>::const_iterator i = exceptions.begin(); i != exceptions.end(); ++i)
+		{
+			LocalUser* u = IS_LOCAL(i->first);
+			if ((u) && (i->second) && (!ext.get(u)))
+				u->Write(line);
+		}
+
+		// Now consider sending it to all other users who has at least a common channel with the user
+		std::set<User*> already_sent;
+		for (UCListIter i = chans.begin(); i != chans.end(); ++i)
+		{
+			const UserMembList* userlist = (*i)->GetUsers();
+			for (UserMembList::const_iterator m = userlist->begin(); m != userlist->end(); ++m)
+			{
+				/*
+				 * Send the line if the channel member in question meets all of the following criteria:
+				 * - local
+				 * - not the user who is doing the action (i.e. whose channels we're iterating)
+				 * - has the given extension
+				 * - not on the except list built by modules
+				 * - we haven't sent the line to the member yet
+				 *
+				 */
+				LocalUser* member = IS_LOCAL(m->first);
+				if ((member) && (member != user) && (!ext.get(member)) && (exceptions.find(member) == exceptions.end()) && (already_sent.insert(member).second))
+					member->Write(line);
+			}
+		}
+	}
+
  public:
 	ModuleIRCv3() : cap_accountnotify(this, "account-notify"),
 					cap_awaynotify(this, "away-notify"),
@@ -84,7 +122,7 @@ class ModuleIRCv3 : public Module
 	void init()
 	{
 		OnRehash(NULL);
-		Implementation eventlist[] = { I_OnChangeHost, I_OnUserJoin, I_OnPostJoin, I_OnSetAway, I_OnEvent, I_OnRehash };
+		Implementation eventlist[] = { I_OnChangeIdent, I_OnChangeHost, I_OnUserJoin, I_OnPostJoin, I_OnSetAway, I_OnEvent, I_OnRehash };
 		ServerInstance->Modules->Attach(eventlist, this, sizeof(eventlist)/sizeof(Implementation));
 	}
 
@@ -103,6 +141,7 @@ class ModuleIRCv3 : public Module
 			cap_awaynotify.HandleEvent(ev);
 		if (extendedjoin)
 			cap_extendedjoin.HandleEvent(ev);
+		cap_chghost.HandleEvent(ev);
 
 		if (accountnotify)
 		{
@@ -128,10 +167,17 @@ class ModuleIRCv3 : public Module
 
 	void OnChangeHost(User* u, const std::string& host)
 	{
-		std::string line =  ":" + u->GetFullHost() + " CHGHOST ";
-		line += std::string(host);
+		std::string lineg =  ":" + u->GetFullHost() + " CHGHOST " + u->ident + " " + host;
+		std::string line, mode;
 
-		WriteNeighboursWithExt(u, line, cap_chghost.ext);
+		WriteNeighboursWithExt(u, lineg, cap_chghost.ext);
+	}
+
+	void OnChangeIdent(User* u, const std::string& ident)
+	{
+		std::string lineg =  ":" + u->GetFullHost() + " CHGHOST " + ident + " " + u->dhost;
+
+		WriteNeighboursWithExt(u, lineg, cap_chghost.ext);
 	}
 
 	void OnUserJoin(Membership* memb, bool sync, bool created, CUList& excepts)
