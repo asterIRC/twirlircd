@@ -37,7 +37,7 @@ class SSLMode : public ModeHandler
 	{
 		if (adding)
 		{
-			if (!channel->IsModeSet('z'))
+			if (!channel->IsModeSet('S'))
 			{
 				if (IS_LOCAL(source))
 				{
