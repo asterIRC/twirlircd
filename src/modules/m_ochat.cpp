@@ -42,7 +42,7 @@ class CommandWallops : public Command
 
 CmdResult CommandWallops::Handle (const std::vector<std::string>& parameters, User *user)
 {
-	std::string wallop("NOTICE :[Oper Notice] ");
+	std::string wallop("WALLOPS :OPERONLY: ");
 	wallop.append(parameters[0]);
 
 	for (LocalUserList::const_iterator i = ServerInstance->Users->local_users.begin(); i != ServerInstance->Users->local_users.end(); i++)
