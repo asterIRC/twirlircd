@@ -47,6 +47,7 @@ class ModulePassForward : public Module
 	}
 
 	ModResult OnWhoisLine(User* fro, User* to, int &numeric, std::string &text) {
+		if (numeric != 312) return MOD_RES_ALLOW;
 		std::string newtext(fro->nick);
 
 		newtext.append(" ");
