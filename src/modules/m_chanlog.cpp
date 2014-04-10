@@ -87,7 +87,7 @@ class ModuleChanLog : public Module
 			if (c)
 			{
 				c->WriteChannelWithServ(ServerInstance->Config->ServerName, "NOTICE %s :%s", c->name.c_str(), buf);
-				ServerInstance->PI->SendChannelPrivmsg(c, 0, buf);
+				ServerInstance->PI->SendChannelNotice(c, 0, buf);
 			}
 		}
 
