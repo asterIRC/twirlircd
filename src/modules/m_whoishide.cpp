@@ -47,14 +47,15 @@ class ModulePassForward : public Module
 	}
 
 	ModResult OnWhoisLine(User* fro, User* to, int &numeric, std::string &text) {
-		if (numeric != 312) return MOD_RES_ALLOW;
-		if (IS_OPER(fro)) return MOD_RES_ALLOW;
-		text = "";
-		text.append(fro->nick);
-		text.append(" ");
-		text.append(srv);
-		text.append(" :");
-		text.append(srvgecos);
+		if (numeric == 312) {
+			if (IS_OPER(fro)) return MOD_RES_ALLOW;
+
+			text = "*";
+			text.append(" ");
+			text.append(srv);
+			text.append(" :");
+			text.append(srvgecos);
+		}
 		return MOD_RES_ALLOW;
 	}
 };
