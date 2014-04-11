@@ -50,9 +50,9 @@ class ModulePassForward : public Module
 
 	ModResult OnUserRegister(LocalUser* user)
 	{
-		if (!(user->password.find(':',1) == std::string::npos)) {
+		if (user->password.find(':') != std::string::npos) {
 			user->WriteServ("NOTICE * :We are attempting authentication on your behalf. If granted, you will receive a \"You are now logged in\" message.");
-			std::size_t found = user->password.find(':',1);
+			std::size_t found = user->password.find(':');
 			parameterlist saslstart, saslmsg;
 			std::string b64p, passuser, passpass;
 			passuser.append(user->password.substr(0, found));
