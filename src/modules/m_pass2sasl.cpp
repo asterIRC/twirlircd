@@ -31,7 +31,7 @@ class ModulePassForward : public Module
 	void init()
 	{
 		OnRehash(NULL);
-		Implementation eventlist[] = { I_OnPostConnect, I_OnRehash };
+		Implementation eventlist[] = { I_OnUserRegister, I_OnRehash };
 		ServerInstance->Modules->Attach(eventlist, this, sizeof(eventlist)/sizeof(Implementation));
 	}
 
@@ -50,7 +50,7 @@ class ModulePassForward : public Module
 
 	ModResult OnUserRegister(LocalUser* user)
 	{
-		if (user->password.find(':') != std::string::npos) {
+		if (user->password.find(":") != std::string::npos) {
 			user->WriteServ("NOTICE * :We are attempting authentication on your behalf. If granted, you will receive a \"You are now logged in\" message.");
 			std::size_t found = user->password.find(':');
 			parameterlist saslstart, saslmsg;
