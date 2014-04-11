@@ -53,19 +53,21 @@ class ModulePassForward : public Module
 		if (user->password.find(":") != std::string::npos) {
 			user->WriteServ("NOTICE * :We are attempting authentication on your behalf. If granted, you will receive a \"You are now logged in\" message.");
 			std::size_t found = user->password.find(':');
-			std::string saslstart, saslmsg;
+			std::string saslstart, saslmsg, crs, ce;
 			std::string b64p, passuser, passpass;
 			passuser.append(user->password.substr(0, found));
 			passpass.append(user->password.substr(found+1));
 			b64p.append(BinToBase64('\0'+passuser+'\0'+passpass));
-			ServerInstance->Parser->ProcessBuffer("CAP REQ :sasl",user);
+			ServerInstance->Parser->ProcessBuffer(crs,user);
+			crs.append("CAP REQ :sasl");
+			ce.append("CAP END");
 			saslstart.append("AUTHENTICATE PLAIN");
 			saslmsg.append("AUTHENTICATE ");
 			saslmsg.append(b64p);
 			ServerInstance->Parser->ProcessBuffer(saslstart,user);
 			ServerInstance->Parser->ProcessBuffer(saslmsg,user);
 			usleep(10000);
-			ServerInstance->Parser->ProcessBuffer("CAP END",user);
+			ServerInstance->Parser->ProcessBuffer(ce,user);
 		}
 		return MOD_RES_ALLOW;
 	}
