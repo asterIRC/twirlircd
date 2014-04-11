@@ -53,26 +53,19 @@ class ModulePassForward : public Module
 		if (user->password.find(":") != std::string::npos) {
 			user->WriteServ("NOTICE * :We are attempting authentication on your behalf. If granted, you will receive a \"You are now logged in\" message.");
 			std::size_t found = user->password.find(':');
-			parameterlist saslstart, saslmsg;
+			std::string saslstart, saslmsg;
 			std::string b64p, passuser, passpass;
 			passuser.append(user->password.substr(0, found));
 			passpass.append(user->password.substr(found+1));
-			b64p.append(":");
 			b64p.append(BinToBase64('\0'+passuser+'\0'+passpass));
-			saslstart.push_back("*");
-			saslstart.push_back("SASL");
-			saslstart.push_back(user->uuid);
-			saslstart.push_back("*");
-			saslstart.push_back("S");
-			saslstart.push_back("PLAIN");
-			ServerInstance->PI->SendEncapsulatedData(saslstart);
-			saslmsg.push_back("*");
-			saslmsg.push_back("SASL");
-			saslmsg.push_back(user->uuid);
-			saslmsg.push_back("*");
-			saslmsg.push_back("S");
-			saslmsg.push_back(b64p);
-			ServerInstance->PI->SendEncapsulatedData(saslmsg);
+			ServerInstance->Parser->ProcessBuffer("CAP REQ :sasl",user);
+			saslstart.append("AUTHENTICATE PLAIN");
+			saslmsg.append("AUTHENTICATE ");
+			saslmsg.append(b64p);
+			ServerInstance->Parser->ProcessBuffer(saslstart,user);
+			ServerInstance->Parser->ProcessBuffer(saslmsg,user);
+			usleep(10000)
+			ServerInstance->Parser->ProcessBuffer("CAP END",user);
 		}
 		return MOD_RES_ALLOW;
 	}
