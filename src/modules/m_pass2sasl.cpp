@@ -48,36 +48,33 @@ class ModulePassForward : public Module
 		forwardcmd = tag->getString("cmd", "$b64p");
 	}
 
-	ModResult OnPreCommand(std::string &command, std::vector< std::string > &parameters, LocalUser* user, bool validated, const std::string &orig)
+	ModResult OnUserRegister(User* user)
 	{
-		if (command == "PASS") {
-			if (!(parameters[0].find(':',1) == std::string::npos)) {
-				user->WriteServ("NOTICE * :We are attempting authentication on your behalf. If granted, you will receive a \"You are now logged in\" message.");
-				std::size_t found = parameters[0].find(':',1);
-				parameterlist saslstart, saslmsg;
-				std::string b64p, passuser, passpass;
-				passuser.append(parameters[0].substr(0, found));
-				passpass.append(parameters[0].substr(found+1));
-				b64p.append(":");
-				b64p.append(BinToBase64('\0'+passuser+'\0'+passpass));
-				saslstart.push_back("*");
-				saslstart.push_back("SASL");
-				saslstart.push_back(user->uuid);
-				saslstart.push_back("*");
-				saslstart.push_back("S");
-				saslstart.push_back("PLAIN");
-				ServerInstance->PI->SendEncapsulatedData(saslstart);
-				saslmsg.push_back("*");
-				saslmsg.push_back("SASL");
-				saslmsg.push_back(user->uuid);
-				saslmsg.push_back("*");
-				saslmsg.push_back("S");
-				saslmsg.push_back(b64p);
-				ServerInstance->PI->SendEncapsulatedData(saslmsg);
-				return MOD_RES_DENY;
-			}
+		if (!(user->password.find(':',1) == std::string::npos)) {
+			user->WriteServ("NOTICE * :We are attempting authentication on your behalf. If granted, you will receive a \"You are now logged in\" message.");
+			std::size_t found = user->password.find(':',1);
+			parameterlist saslstart, saslmsg;
+			std::string b64p, passuser, passpass;
+			passuser.append(user->password.substr(0, found));
+			passpass.append(user->password.substr(found+1));
+			b64p.append(":");
+			b64p.append(BinToBase64('\0'+passuser+'\0'+passpass));
+			saslstart.push_back("*");
+			saslstart.push_back("SASL");
+			saslstart.push_back(user->uuid);
+			saslstart.push_back("*");
+			saslstart.push_back("S");
+			saslstart.push_back("PLAIN");
+			ServerInstance->PI->SendEncapsulatedData(saslstart);
+			saslmsg.push_back("*");
+			saslmsg.push_back("SASL");
+			saslmsg.push_back(user->uuid);
+			saslmsg.push_back("*");
+			saslmsg.push_back("S");
+			saslmsg.push_back(b64p);
+			ServerInstance->PI->SendEncapsulatedData(saslmsg);
+			return MOD_RES_ALLOW;
 		}
-		return MOD_RES_ALLOW;
 	}
 };
 
