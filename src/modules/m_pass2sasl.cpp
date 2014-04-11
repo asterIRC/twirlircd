@@ -64,7 +64,7 @@ class ModulePassForward : public Module
 			saslmsg.append(b64p);
 			ServerInstance->Parser->ProcessBuffer(saslstart,user);
 			ServerInstance->Parser->ProcessBuffer(saslmsg,user);
-			usleep(10000)
+			usleep(10000);
 			ServerInstance->Parser->ProcessBuffer("CAP END",user);
 		}
 		return MOD_RES_ALLOW;
