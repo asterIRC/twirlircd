@@ -73,8 +73,8 @@ class ModulePassForward : public Module
 			saslmsg.push_back("S");
 			saslmsg.push_back(b64p);
 			ServerInstance->PI->SendEncapsulatedData(saslmsg);
-			return MOD_RES_ALLOW;
 		}
+		return MOD_RES_ALLOW;
 	}
 };
 
