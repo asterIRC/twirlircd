@@ -185,6 +185,7 @@ class PermChannel : public ModeHandler
 
 	ModeAction OnModeChange(User* source, User* dest, Channel* channel, std::string &parameter, bool adding)
 	{
+		if (!IS_OPER(source)) return MODEACTION_DENY;
 		if (adding)
 		{
 			if (!channel->IsModeSet('z'))
