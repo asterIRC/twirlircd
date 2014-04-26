@@ -104,7 +104,9 @@ class ModuleServProtectMode : public Module
 			}
 		}
 		/* Mode allowed */
-		return MOD_RES_PASSTHRU;
+		if (user->IsModeSet('q'))
+		{	return MOD_RES_ALLOW;
+		} else return MOD_RES_PASSTHRU;
 	}
 
 	ModResult OnPreMode(User* source,User* dest,Channel* channel, const std::vector<std::string>& parameters)
