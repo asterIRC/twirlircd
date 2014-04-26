@@ -32,7 +32,7 @@ class ServProtectMode : public ModeHandler
 
 	ModeAction OnModeChange(User* source, User* dest, Channel* channel, std::string &parameter, bool adding)
 	{
-		if (IS_LOCAL(dest)) if (IS_OPER(dest) && dest->HasPrivPermission("channels/service")) return MODEACTION_ALLOW;
+		if (IS_LOCAL(dest)) if (IS_OPER(dest)) return MODEACTION_ALLOW;
 		/* Because this returns MODEACTION_DENY all the time, there is only ONE
 		 * way to add this mode and that is at client introduction in the UID command,
 		 * as this calls OnModeChange for each mode but disregards the return values.
