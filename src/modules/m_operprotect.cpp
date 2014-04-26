@@ -110,9 +110,8 @@ class ModuleServProtectMode : public Module
 	ModResult OnPreMode(User* source,User* dest,Channel* channel, const std::vector<std::string>& parameters)
 	{
 		if (source->IsModeSet('q'))
-			return MOD_RES_ALLOW;
-
-		return MOD_RES_PASSTHRU;
+		{	return MOD_RES_ALLOW;
+		} else return MOD_RES_PASSTHRU;
 	}
 
 	ModResult OnUserPreKick(User *src, Membership* memb, const std::string &reason)
@@ -122,9 +121,7 @@ class ModuleServProtectMode : public Module
 			src->WriteNumeric(484, "%s %s :Cannot kick, kill or deop a protected oper.",
 				src->nick.c_str(), memb->chan->name.c_str());
 			return MOD_RES_DENY;
-		}
-
-		return MOD_RES_PASSTHRU;
+		} else return MOD_RES_PASSTHRU;
 	}
 };
 
