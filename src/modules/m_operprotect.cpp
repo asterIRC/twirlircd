@@ -32,7 +32,7 @@ class ServProtectMode : public ModeHandler
 
 	ModeAction OnModeChange(User* source, User* dest, Channel* channel, std::string &parameter, bool adding)
 	{
-		if (IS_LOCAL(dest)) if (IS_OPER(dest)) return MODEACTION_ALLOW;
+		return MODEACTION_ALLOW;
 		/* Because this returns MODEACTION_DENY all the time, there is only ONE
 		 * way to add this mode and that is at client introduction in the UID command,
 		 * as this calls OnModeChange for each mode but disregards the return values.
@@ -41,7 +41,6 @@ class ServProtectMode : public ModeHandler
 		 * I'm sure if someone really wants to do that they can make a copy of this module
 		 * that does the job. It won't be me though!
 		 */
-		return MODEACTION_DENY;
 	}
 };
 
@@ -96,7 +95,7 @@ class ModuleServProtectMode : public Module
 				 * This includes any prefix permission mode, even those registered in other modules, e.g. +qaohv. Using ::ModeString()
 				 * here means that the number of modes is restricted to only modes the user has, limiting it to as short a loop as possible.
 				 */
-				if (u->IsModeSet('q') && !(user->IsModeSet('q')))
+				if (u->IsModeSet('q'))
 				{
 					/* BZZZT, Denied! */
 					user->WriteNumeric(482, "%s %s :Cannot kick, kill or deop a protected oper", user->nick.c_str(), chan->name.c_str()/*, ServerInstance->Config->Network.c_str()*/);
