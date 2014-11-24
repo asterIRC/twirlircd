@@ -181,11 +181,10 @@ static bool WriteDatabase(Module* mod, bool save_listmodes)
 class PermChannel : public ModeHandler
 {
  public:
-	PermChannel(Module* Creator) : ModeHandler(Creator, "permanent", 'z', PARAM_NONE, MODETYPE_CHANNEL) { oper = true; }
+	PermChannel(Module* Creator) : ModeHandler(Creator, "permanent", 'z', PARAM_NONE, MODETYPE_CHANNEL) { }
 
 	ModeAction OnModeChange(User* source, User* dest, Channel* channel, std::string &parameter, bool adding)
 	{
-		if (!IS_OPER(source)) return MODEACTION_DENY;
 		if (adding)
 		{
 			if (!channel->IsModeSet('z'))
@@ -196,6 +195,7 @@ class PermChannel : public ModeHandler
 		}
 		else
 		{
+			if (!IS_OPER(source)) return MODEACTION_DENY;
 			if (channel->IsModeSet('z'))
 			{
 				channel->SetMode(this,false);

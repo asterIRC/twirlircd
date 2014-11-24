@@ -64,7 +64,7 @@ class ModuleStripColor : public Module
 
 	virtual void On005Numeric(std::string &output)
 	{
-		ServerInstance->AddExtBanChar('S');
+		ServerInstance->AddExtBanChar('c');
 	}
 
 	virtual ModResult OnUserPreMessage(User* user,void* dest,int target_type, std::string &text, char status, CUList &exempt_list)
@@ -105,7 +105,6 @@ class ModuleStripColor : public Module
 						Channel* t = (Channel*)dest;
 						user->WriteNumeric(404, "%s %s :Message not delivered as sent (colours were stripped because +c is set)",user->nick.c_str(), t->name.c_str());
 						InspIRCd::StripColor(text);
-						user->Write(":%s!%s@%s PRIVMSG %s :[stripcolor] %s",user->nick.c_str(),user->ident.c_str(),user->dhost.c_str(),t->name.c_str(),text.c_str());
 					} else if (target_type == TYPE_USER) {
 						User* t = (User*)dest;
 						user->WriteNumeric(404, "%s %s :Message not delivered as sent (colours were stripped because +S is set)",user->nick.c_str(), t->nick.c_str());

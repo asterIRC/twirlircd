@@ -532,7 +532,12 @@ bool XLine::IsBurstable()
 void XLine::DefaultApply(User* u, const std::string &line, bool bancache)
 {
 	char sreason[MAXBUF];
-	snprintf(sreason, MAXBUF, "%s-Lined: %s", line.c_str(), this->reason.c_str());
+	if (line.compare("G") == 0)
+		snprintf(sreason, MAXBUF, "Akilled: %s", this->reason.c_str());
+	else if (line.compare("K") == 0)
+		snprintf(sreason, MAXBUF, "Please use another server; %s", this->reason.c_str());
+	else
+		snprintf(sreason, MAXBUF, "%s-Lined: %s", line.c_str(), this->reason.c_str());
 	if (!ServerInstance->Config->MoronBanner.empty())
 		u->WriteServ("NOTICE %s :*** %s", u->nick.c_str(), ServerInstance->Config->MoronBanner.c_str());
 
