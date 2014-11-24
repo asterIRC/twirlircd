@@ -1,6 +1,6 @@
 *~
 *.swp
-
+/certtool.template
 /.config.cache
 /.modulemanager
 /BSDmakefile
